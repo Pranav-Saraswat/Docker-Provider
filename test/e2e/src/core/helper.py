@@ -16,149 +16,167 @@ from results_utility import append_result_output
 # This function to check the status of deployment
 def check_kubernetes_deployment_status(deployment_namespace, deployment_name, outfile=None):
     try:
-       api_instance = client.AppsV1Api()
-       deployment = read_deployment(
-           api_instance, deployment_namespace, deployment_name)
-       append_result_output(
-           "deployment output {}\n".format(deployment), outfile)
+        api_instance = client.AppsV1Api()
+        deployment = read_deployment(
+            api_instance, deployment_namespace, deployment_name)
+        append_result_output(f"deployment output {deployment}\n", outfile)
 
-       if not deployment:
-           pytest.fail(
-               "deployment is nil or empty for deployment {}.".format(deployment_name))
+        if not deployment:
+            pytest.fail(f"deployment is nil or empty for deployment {deployment_name}.")
 
-       deployment_status = deployment.status
-       if not deployment_status:
-           pytest.fail(
-               "deployment_status is nil or empty {}.".format(deployment_name))
+        deployment_status = deployment.status
+        if not deployment_status:
+            pytest.fail(f"deployment_status is nil or empty {deployment_name}.")
 
-       availableReplicas = deployment_status.available_replicas
-       readyReplicas = deployment_status.ready_replicas
-       replicas = deployment_status.replicas
+        availableReplicas = deployment_status.available_replicas
+        readyReplicas = deployment_status.ready_replicas
+        replicas = deployment_status.replicas
 
-       if not availableReplicas:
-          pytest.fail(
-              "availableReplicas is 0 or empty for deployment: {}".format(deployment_name))
+        if not availableReplicas:
+            pytest.fail(
+                f"availableReplicas is 0 or empty for deployment: {deployment_name}"
+            )
 
-       if not readyReplicas:
-          pytest.fail(
-              "readyReplicas is 0 or empty for deployment: {}".format(deployment_name))
 
-       if not replicas:
-          pytest.fail(
-              "readyReplicas is 0 or empty for deployment: {}".format(deployment_name))
+        if not readyReplicas:
+            pytest.fail(f"readyReplicas is 0 or empty for deployment: {deployment_name}")
 
-       if (replicas != availableReplicas):
-           pytest.fail("availableReplicas doesnt match with expected replicas for the deployment {}.".format(
-               deployment_name))
-       if (replicas != readyReplicas):
-           pytest.fail("readyReplicas doesnt match with expected replicas for the deployment {}.".format(
-               deployment_name))
+        if not replicas:
+            pytest.fail(f"readyReplicas is 0 or empty for deployment: {deployment_name}")
+
+        if (replicas != availableReplicas):
+            pytest.fail(
+                f"availableReplicas doesnt match with expected replicas for the deployment {deployment_name}."
+            )
+
+        if (replicas != readyReplicas):
+            pytest.fail(
+                f"readyReplicas doesnt match with expected replicas for the deployment {deployment_name}."
+            )
+
 
     except Exception as e:
-        pytest.fail("Error occured while checking deployment status: " + str(e))
+        pytest.fail(f"Error occured while checking deployment status: {str(e)}")
 
 # This function to check the status of daemonset
 def check_kubernetes_daemonset_status(daemonset_namespace, daemonset_name, outfile=None):
     try:
-       api_instance = client.AppsV1Api()
-       daemonset = read_daemon_set(
-           api_instance, daemonset_namespace, daemonset_name)
-       append_result_output("daemonset output {}\n".format(daemonset), outfile)
+        api_instance = client.AppsV1Api()
+        daemonset = read_daemon_set(
+            api_instance, daemonset_namespace, daemonset_name)
+        append_result_output(f"daemonset output {daemonset}\n", outfile)
 
-       if not daemonset:
-           pytest.fail(
-               "daemonset is nil or empty for deployment {}.".format(daemonset_name))
+        if not daemonset:
+            pytest.fail(f"daemonset is nil or empty for deployment {daemonset_name}.")
 
-       daemonset_status = daemonset.status
-       if not daemonset_status:
-           pytest.fail(
-               "daemonset_status is nil or empty {}.".format(daemonset_name))
+        daemonset_status = daemonset.status
+        if not daemonset_status:
+            pytest.fail(f"daemonset_status is nil or empty {daemonset_name}.")
 
-       currentNumberScheduled = daemonset_status.current_number_scheduled
-       if not currentNumberScheduled:
-           pytest.fail("currentNumberScheduled shouldnt be null or empty for  daemonset {}.".format(
-               daemonset_name))
+        currentNumberScheduled = daemonset_status.current_number_scheduled
+        if not currentNumberScheduled:
+            pytest.fail(
+                f"currentNumberScheduled shouldnt be null or empty for  daemonset {daemonset_name}."
+            )
 
-       desiredNumberScheduled = daemonset_status.desired_number_scheduled
-       if not desiredNumberScheduled:
-           pytest.fail("desiredNumberScheduled shouldnt be null or empty for  daemonset {}.".format(
-               daemonset_name))
 
-       numberAvailable = daemonset_status.number_available
-       if not numberAvailable:
-           pytest.fail("numberAvailable shouldnt be null or empty for  daemonset {}.".format(
-               daemonset_name))
+        desiredNumberScheduled = daemonset_status.desired_number_scheduled
+        if not desiredNumberScheduled:
+            pytest.fail(
+                f"desiredNumberScheduled shouldnt be null or empty for  daemonset {daemonset_name}."
+            )
 
-       numberReady = daemonset_status.number_ready
-       if not numberReady:
-           pytest.fail("numberReady shouldnt be null or empty for  daemonset {}.".format(
-               daemonset_name))
-       numberMisscheduled = daemonset_status.number_misscheduled     
-       if desiredNumberScheduled <= 0:
-           pytest.fail("desiredNumberScheduled shouldnt less than equal to 0 for the  daemonset {}.".format(
-               daemonset_name))
 
-       if (currentNumberScheduled != desiredNumberScheduled):
-           pytest.fail("currentNumberScheduled doesnt match with desiredNumberScheduled for the daemonset {}.".format(
-               daemonset_name))
+        numberAvailable = daemonset_status.number_available
+        if not numberAvailable:
+            pytest.fail(
+                f"numberAvailable shouldnt be null or empty for  daemonset {daemonset_name}."
+            )
 
-       if (numberAvailable != numberReady):
-           pytest.fail("numberAvailable doesnt match with expected numberReady for the daemonset {}.".format(
-               daemonset_name))
 
-       if (numberMisscheduled > 0):
-           pytest.fail("numberMisscheduled shouldnt be greater than 0 for the daemonset {}.".format(
-               daemonset_name))
+        numberReady = daemonset_status.number_ready
+        if not numberReady:
+            pytest.fail(
+                f"numberReady shouldnt be null or empty for  daemonset {daemonset_name}."
+            )
+
+        numberMisscheduled = daemonset_status.number_misscheduled
+        if desiredNumberScheduled <= 0:
+            pytest.fail(
+                f"desiredNumberScheduled shouldnt less than equal to 0 for the  daemonset {daemonset_name}."
+            )
+
+
+        if (currentNumberScheduled != desiredNumberScheduled):
+            pytest.fail(
+                f"currentNumberScheduled doesnt match with desiredNumberScheduled for the daemonset {daemonset_name}."
+            )
+
+
+        if (numberAvailable != numberReady):
+            pytest.fail(
+                f"numberAvailable doesnt match with expected numberReady for the daemonset {daemonset_name}."
+            )
+
+
+        if (numberMisscheduled > 0):
+            pytest.fail(
+                f"numberMisscheduled shouldnt be greater than 0 for the daemonset {daemonset_name}."
+            )
+
 
     except Exception as e:
-        pytest.fail("Error occured while checking daemonset status: " + str(e))
+        pytest.fail(f"Error occured while checking daemonset status: {str(e)}")
 
 # This function checks the status of kubernetes pods
 def check_kubernetes_pods_status(pod_namespace, label_selector, expectedPodRestartCount, outfile=None):
     try:
-       api_instance = client.CoreV1Api()
-       pod_list = get_pod_list(api_instance, pod_namespace, label_selector)
-       append_result_output("podlist output {}\n".format(pod_list), outfile)
-       if not pod_list:
-           pytest.fail("pod_list shouldnt be null or empty")
-       pods = pod_list.items
-       if not pods:
-           pytest.fail("pod items shouldnt be null or empty")
-       if len(pods) <= 0:
-           pytest.fail("pod count should be greater than 0")
-       for pod in pods:
-          status = pod.status
-          podstatus = status.phase
-          if not podstatus:
-              pytest.fail("status should not be null or empty")
-          if podstatus != "Running":
-              pytest.fail("pod status should be in running state")
-          containerStatuses = status.container_statuses
-          if not containerStatuses:
-              pytest.fail("containerStatuses shouldnt be nil or empty")
-          if len(containerStatuses) <= 0:
-              pytest.fail("length containerStatuses should be greater than 0")
-          for containerStatus in containerStatuses:
-              containerId = containerStatus.container_id
-              if not containerId:
-                 pytest.fail("containerId shouldnt be nil or empty")
-              image = containerStatus.image
-              if not image:
-                  pytest.fail("image shouldnt be nil or empty")
-              imageId = containerStatus.image_id
-              if not imageId:
-                  pytest.fail("imageId shouldnt be nil or empty")
-              restartCount = containerStatus.restart_count
-              if restartCount > expectedPodRestartCount:
-                  pytest.fail("restartCount shouldnt be greater than expected pod restart count: {}".format(expectedPodRestartCount))
-              ready = containerStatus.ready
-              if not ready:
-                 pytest.fail("container status should be in ready state")
-              containerState = containerStatus.state
-              if not containerState.running:
-                pytest.fail("container state should be in running state")
+        api_instance = client.CoreV1Api()
+        pod_list = get_pod_list(api_instance, pod_namespace, label_selector)
+        append_result_output(f"podlist output {pod_list}\n", outfile)
+        if not pod_list:
+            pytest.fail("pod_list shouldnt be null or empty")
+        pods = pod_list.items
+        if not pods:
+            pytest.fail("pod items shouldnt be null or empty")
+        if len(pods) <= 0:
+            pytest.fail("pod count should be greater than 0")
+        for pod in pods:
+            status = pod.status
+            podstatus = status.phase
+            if not podstatus:
+                pytest.fail("status should not be null or empty")
+            if podstatus != "Running":
+                pytest.fail("pod status should be in running state")
+            containerStatuses = status.container_statuses
+            if not containerStatuses:
+                pytest.fail("containerStatuses shouldnt be nil or empty")
+            if len(containerStatuses) <= 0:
+                pytest.fail("length containerStatuses should be greater than 0")
+            for containerStatus in containerStatuses:
+                containerId = containerStatus.container_id
+                if not containerId:
+                   pytest.fail("containerId shouldnt be nil or empty")
+                image = containerStatus.image
+                if not image:
+                    pytest.fail("image shouldnt be nil or empty")
+                imageId = containerStatus.image_id
+                if not imageId:
+                    pytest.fail("imageId shouldnt be nil or empty")
+                restartCount = containerStatus.restart_count
+                if restartCount > expectedPodRestartCount:
+                    pytest.fail(
+                        f"restartCount shouldnt be greater than expected pod restart count: {expectedPodRestartCount}"
+                    )
+
+                ready = containerStatus.ready
+                if not ready:
+                   pytest.fail("container status should be in ready state")
+                containerState = containerStatus.state
+                if not containerState.running:
+                  pytest.fail("container state should be in running state")
     except Exception as e:
-        pytest.fail("Error occured while checking pods status: " + str(e))
+        pytest.fail(f"Error occured while checking pods status: {str(e)}")
 
 
 def check_namespace_status_using_watch(outfile=None, namespace_list=None, timeout=300):
@@ -179,12 +197,9 @@ def check_namespace_status_using_watch(outfile=None, namespace_list=None, timeou
                 return False
             if namespace_status.get('phase') == 'Active':
                 namespace_dict[namespace_name] = 1
-            if all(ele == 1 for ele in list(namespace_dict.values())):
-                return True
-            return False
+            return all((ele == 1 for ele in list(namespace_dict.values())))
         except Exception as e:
-            pytest.fail(
-                "Error occured while processing the namespace event: " + str(e))
+            pytest.fail(f"Error occured while processing the namespace event: {str(e)}")
 
     # Checking the namespace status
     api_instance = client.CoreV1Api()
@@ -242,7 +257,7 @@ def check_kubernetes_daemonset_status_using_watch(daemonset_namespace, outfile=N
 
             return True
         except Exception as e:
-            print("Error occured while processing the pod event: " + str(e))
+            print(f"Error occured while processing the pod event: {str(e)}")
 
     # Checking status of all pods
     if daemonset_label_dict:
@@ -294,7 +309,7 @@ def check_kubernetes_deployments_status_using_watch(deployment_namespace, outfil
 
             return True
         except Exception as e:
-            print("Error occured while processing the pod event: " + str(e))
+            print(f"Error occured while processing the pod event: {str(e)}")
 
     # Checking status of all pods
     if deployment_label_dict:
@@ -342,12 +357,9 @@ def check_kubernetes_pods_status_using_watch(pod_namespace, outfile=None, pod_la
                         return False
                     else:
                         pod_label_dict[current_label_value] = 1
-            if all(ele == 1 for ele in list(pod_label_dict.values())):
-                return True
-            return False
+            return all((ele == 1 for ele in list(pod_label_dict.values())))
         except Exception as e:
-            pytest.fail(
-                "Error occured while processing the pod event: " + str(e))
+            pytest.fail(f"Error occured while processing the pod event: {str(e)}")
 
     # Checking status of all pods
     if pod_label_dict:
@@ -373,7 +385,7 @@ def check_kubernetes_crd_status_using_watch(crd_group, crd_version, crd_namespac
                         "The CRD instance status has been updated with incorrect value for '{}' field.".format(status_field))
             return True
         except Exception as e:
-            pytest.fail("Error occured while processing crd event: " + str(e))
+            pytest.fail(f"Error occured while processing crd event: {str(e)}")
 
     # Checking if CRD instance has been updated with status fields
     api_instance = client.CustomObjectsApi()
@@ -394,16 +406,13 @@ def check_kubernetes_pod_logs_using_watch(pod_namespace, pod_name, container_nam
             append_result_output("{}\n".format(event), outfile)
             for error_log in error_logs_list:
                 if error_log in event:
-                    pytest.fail("Error log found: " + event)
+                    pytest.fail(f"Error log found: {event}")
             for log in logs_dict:
                 if log in event:
                     logs_dict[log] = 1
-            if all(ele == 1 for ele in list(logs_dict.values())):
-                return True
-            return False
+            return all((ele == 1 for ele in list(logs_dict.values())))
         except Exception as e:
-            pytest.fail(
-                "Error occured while processing pod log event: " + str(e))
+            pytest.fail(f"Error occured while processing pod log event: {str(e)}")
 
     # Checking the pod logs
     api_instance = client.CoreV1Api()
@@ -416,12 +425,9 @@ def check_kubernetes_secret_using_watch(secret_namespace, secret_name, timeout=3
     def secret_event_callback(event):
         try:
             secret_data = event['raw_object'].get('data')
-            if not secret_data:
-                return False
-            return True
+            return bool(secret_data)
         except Exception as e:
-            pytest.fail(
-                "Error occured while processing secret event: " + str(e))
+            pytest.fail(f"Error occured while processing secret event: {str(e)}")
 
     # Checking the kubernetes secret
     api_instance = client.CoreV1Api()

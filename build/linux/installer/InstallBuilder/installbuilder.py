@@ -8,7 +8,7 @@ import aixlpp
 import hpuxpackage
 import scxutil
 
-Variables = dict()
+Variables = {}
 Defines = []
 
 # Parse command line arguments
@@ -20,7 +20,7 @@ for arg in sys.argv[1:]:
         args.append(arg)
         continue
 
-    if arg[0:2] == "--":
+    if arg[:2] == "--":
         tokens = arg[2:].split("=",1)
         if len(tokens) == 1:
             # This is a define
@@ -38,7 +38,7 @@ dfp.InhaleDataFiles(Variables["DATAFILE_PATH"], args)
 dfp.EvaluateVariablesAndDefines()
 
 # Include all variables specified at the command line in the variable dict, as well as overwrite any that were specified in data files
-for var in Variables.keys():
+for var in Variables:
     dfp.variables[var] = Variables[var]
 for define in Defines:
     dfp.defines.append(define)
@@ -60,25 +60,19 @@ if "DEBUG" in dfp.defines:
     dfp.Debug()
 
 # Make the staging directory
-retval = os.system('mkdir -p %s' % stagingDir)
+retval = os.system(f'mkdir -p {stagingDir}')
 if retval != 0:
-    sys.stderr.write("Error: Unable to create staging directory %s" % stagingDir)
+    sys.stderr.write(f"Error: Unable to create staging directory {stagingDir}")
     exit(1)
 
 for d in Directories:
     scxutil.MkAllDirs(stagingDir + d.stagedLocation)
-    pass
-
 for f in Files:
     scxutil.Copy(os.path.join(baseDir, f.baseLocation),
                  stagingDir + f.stagedLocation)
-    pass
-
 for l in Links:
     scxutil.Link(l.baseLocation,
                  stagingDir + l.stagedLocation)
-    pass
-
 if dfp.variables["PF"] == "Linux":
     if dfp.variables["PACKAGE_TYPE"] == "RPM":
         packageObject = linuxrpm.LinuxRPMFile(intermediateDir,

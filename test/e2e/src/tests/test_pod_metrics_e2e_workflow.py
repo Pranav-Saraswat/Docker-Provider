@@ -22,7 +22,7 @@ def test_pod_metrics_e2e_workflow(env_dict):
     try:
         config.load_incluster_config()
     except Exception as e:
-        pytest.fail("Error loading the in-cluster config: " + str(e))
+        pytest.fail(f"Error loading the in-cluster config: {str(e)}")
 
     # query time interval for metrics queries
     metricQueryIntervalInMins = env_dict['DEFAULT_METRICS_QUERY_TIME_INTERVAL_IN_MINUTES']
@@ -59,7 +59,7 @@ def test_pod_metrics_e2e_workflow(env_dict):
     for env in envVars:
         if env.name == "AKS_RESOURCE_ID":
             clusterResourceId = env.value
-            print("cluster resource id: {}".format(clusterResourceId))
+            print(f"cluster resource id: {clusterResourceId}")
 
     if not clusterResourceId:
         pytest.fail(
@@ -82,23 +82,27 @@ def test_pod_metrics_e2e_workflow(env_dict):
         pytest.fail("access_token shouldnt be null or empty")
 
     waitTimeSeconds = env_dict['AGENT_WAIT_TIME_SECS']
-    print("start: waiting for seconds: {} for agent workflows to get emitted".format(
-        waitTimeSeconds))
+    print(
+        f"start: waiting for seconds: {waitTimeSeconds} for agent workflows to get emitted"
+    )
+
     time.sleep(int(waitTimeSeconds))
-    print("complete: waiting for seconds: {} for agent workflows to get emitted".format(
-        waitTimeSeconds))
+    print(
+        f"complete: waiting for seconds: {waitTimeSeconds} for agent workflows to get emitted"
+    )
+
 
     # validate metrics e2e workflow
     now = datetime.utcnow()
-    endtime = now.isoformat()[:-3]+'Z'
-    starttime = (now - timedelta(hours=0,
-                                 minutes=constants.DEFAULT_METRICS_QUERY_TIME_INTERVAL_IN_MINUTES)).isoformat()[:-3]+'Z'
+    endtime = f'{now.isoformat()[:-3]}Z'
+    starttime = f'{(now - timedelta(hours=0, minutes=constants.DEFAULT_METRICS_QUERY_TIME_INTERVAL_IN_MINUTES)).isoformat()[:-3]}Z'
+
     Headers = {
-        "Authorization": str("Bearer " + access_token),
+        "Authorization": str(f"Bearer {access_token}"),
         "Content-Type": "application/json",
-        "content-length": "0"
+        "content-length": "0",
     }
-    params = {}
+
     # pod metric - PodCount
     custommetricsUrl = '{0}{1}/providers/microsoft.Insights/metrics?timespan={2}/{3}&interval=FULL&metricnames={4}&aggregation={5}&metricNamespace={6}&validatedimensions=false&api-version={7}'.format(
         resourceManager.rstrip("/"),
@@ -110,6 +114,7 @@ def test_pod_metrics_e2e_workflow(env_dict):
         constants.POD_METRICS_NAMESPACE,
         constants.METRICS_API_VERSION)
 
+    params = {}
     response = requests.get(custommetricsUrl, params=params, headers=Headers)
 
     if not response:
@@ -117,8 +122,10 @@ def test_pod_metrics_e2e_workflow(env_dict):
             "response of the metrics query API shouldnt be null or empty")
 
     if response.status_code != 200:
-        pytest.fail("metrics query API failed with an error code: {}".format(
-            response.status_code))
+        pytest.fail(
+            f"metrics query API failed with an error code: {response.status_code}"
+        )
+
 
     responseJSON = response.json()
     if not responseJSON:

@@ -20,7 +20,7 @@ def test_e2e_workflows(env_dict):
     try:
         config.load_incluster_config()
     except Exception as e:
-        pytest.fail("Error loading the in-cluster config: " + str(e))
+        pytest.fail(f"Error loading the in-cluster config: {str(e)}")
 
     # query time interval for LA queries
     queryTimeInterval = env_dict['DEFAULT_QUERY_TIME_INTERVAL_IN_MINUTES']
@@ -55,7 +55,7 @@ def test_e2e_workflows(env_dict):
     for env in envVars:
         if env.name == "AKS_RESOURCE_ID":
             clusterResourceId = env.value
-            print("cluster resource id: {}".format(clusterResourceId))
+            print(f"cluster resource id: {clusterResourceId}")
 
     if not clusterResourceId:
             pytest.fail("failed to get clusterResourceId from replicaset pod environment variables")
@@ -75,16 +75,23 @@ def test_e2e_workflows(env_dict):
         pytest.fail("access_token shouldnt be null or empty")
 
     # validate e2e workflows by checking data in log analytics workspace through resource centric queries
-    queryUrl = resource + "/v1" + clusterResourceId + "/query"
+    queryUrl = f"{resource}/v1{clusterResourceId}/query"
     Headers = {
-        "Authorization": str("Bearer " + access_token),
-        "Content-Type": "application/json"
+        "Authorization": str(f"Bearer {access_token}"),
+        "Content-Type": "application/json",
     }
 
+
     waitTimeSeconds = env_dict['AGENT_WAIT_TIME_SECS']
-    print("start: waiting for seconds: {} for agent workflows to get emitted".format(waitTimeSeconds))
+    print(
+        f"start: waiting for seconds: {waitTimeSeconds} for agent workflows to get emitted"
+    )
+
     time.sleep(int(waitTimeSeconds))
-    print("complete: waiting for seconds: {} for agent workflows to get emitted".format(waitTimeSeconds))
+    print(
+        f"complete: waiting for seconds: {waitTimeSeconds} for agent workflows to get emitted"
+    )
+
 
     # KubePodInventory
     query = constants.KUBE_POD_INVENTORY_QUERY.format(queryTimeInterval)
@@ -330,7 +337,6 @@ def test_e2e_workflows(env_dict):
     if not rowCount:
         pytest.fail("rowCount should be greater than for cluster: {0} for workflow: {1} ".format(clusterResourceId, 'CONTAINER_LOG'))
 
-     # InsightsMetrics
     query = constants.INSIGHTS_METRICS_QUERY.format(queryTimeInterval)
     params = { 'query': query}
     result = requests.get(queryUrl, params=params, headers=Headers)

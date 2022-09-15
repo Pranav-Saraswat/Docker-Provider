@@ -20,7 +20,7 @@ def test_resource_status(env_dict):
         config.load_incluster_config()
         #config.load_kube_config()
     except Exception as e:
-        pytest.fail("Error loading the in-cluster config: " + str(e))
+        pytest.fail(f"Error loading the in-cluster config: {str(e)}")
 
     waitTimeSeconds = env_dict['AGENT_WAIT_TIME_SECS']
     time.sleep(int(waitTimeSeconds))
@@ -38,17 +38,16 @@ def test_resource_status(env_dict):
     check_kubernetes_pods_status(constants.AGENT_RESOURCES_NAMESPACE,
                                  constants.AGENT_DEPLOYMENT_PODS_LABEL_SELECTOR, expectedPodRestartCount, env_dict['TEST_AGENT_LOG_FILE'])
 
-    # checking daemonset pod status
-    isNonArcK8Environment = env_dict.get('IS_NON_ARC_K8S_TEST_ENVIRONMENT')
-
-    if not isNonArcK8Environment:
-        check_kubernetes_pods_status(constants.AGENT_RESOURCES_NAMESPACE,
-                                 constants.AGENT_DAEMON_SET_PODS_LABEL_SELECTOR, expectedPodRestartCount, env_dict['TEST_AGENT_LOG_FILE'])
-    else:
+    if isNonArcK8Environment := env_dict.get(
+        'IS_NON_ARC_K8S_TEST_ENVIRONMENT'
+    ):
         check_kubernetes_pods_status(constants.AGENT_RESOURCES_NAMESPACE,
                             constants.AGENT_DAEMON_SET_PODS_LABEL_SELECTOR_NON_ARC, expectedPodRestartCount, env_dict['TEST_AGENT_LOG_FILE'])
 
 
+    else:
+        check_kubernetes_pods_status(constants.AGENT_RESOURCES_NAMESPACE,
+                                 constants.AGENT_DAEMON_SET_PODS_LABEL_SELECTOR, expectedPodRestartCount, env_dict['TEST_AGENT_LOG_FILE'])
     append_result_output("test_resource_status end \n",
                          env_dict['TEST_AGENT_LOG_FILE'])
     print("Successfully checked resource status check.")

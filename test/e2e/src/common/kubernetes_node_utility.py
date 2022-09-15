@@ -8,5 +8,5 @@ def list_kubernetes_nodes(api_instance):
     try:
         return api_instance.list_node()
     except Exception as e:
-        pytest.fail("Error occured while retrieving node information: " + str(e))
+        pytest.fail(f"Error occured while retrieving node information: {str(e)}")
 

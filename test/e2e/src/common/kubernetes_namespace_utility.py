@@ -12,7 +12,7 @@ def watch_namespace(api_instance, timeout, callback=None):
             if callback(event):
                 return
     except Exception as e:
-        pytest.fail("Error occurred when checking namespace status: " + str(e))
+        pytest.fail(f"Error occurred when checking namespace status: {str(e)}")
     pytest.fail("The watch on the namespaces has timed out.")
 
 
@@ -21,7 +21,7 @@ def list_namespace(api_instance):
     try:
         return api_instance.list_namespace()
     except Exception as e:
-        pytest.fail("Error occured when retrieving namespaces: " + str(e))
+        pytest.fail(f"Error occured when retrieving namespaces: {str(e)}")
 
 
 # Function to delete a kubernetes namespaces
@@ -29,4 +29,4 @@ def delete_namespace(api_instance, namespace_name):
     try:
         return api_instance.delete_namespace(namespace_name)
     except Exception as e:
-        pytest.fail("Error occured when deleting namespace: " + str(e))
+        pytest.fail(f"Error occured when deleting namespace: {str(e)}")

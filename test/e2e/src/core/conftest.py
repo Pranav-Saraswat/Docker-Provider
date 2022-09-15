@@ -15,7 +15,7 @@ pytestmark = pytest.mark.agentests
 @pytest.fixture(scope='session', autouse=True)
 def env_dict():
     my_file = Path("env.pkl")  # File to store the environment variables.
-    with FileLock(str(my_file) + ".lock"):  # Locking the file since each test will be run in parallel as separate subprocesses and may try to access the file simultaneously.
+    with FileLock(f"{str(my_file)}.lock"):  # Locking the file since each test will be run in parallel as separate subprocesses and may try to access the file simultaneously.
         env_dict = {}
         if not my_file.is_file():
             # Creating the results directory
@@ -43,7 +43,10 @@ def env_dict():
             # get default query time interval for log analytics queries
             queryTimeInterval = int(os.getenv('DEFAULT_QUERY_TIME_INTERVAL_IN_MINUTES')) if os.getenv('DEFAULT_QUERY_TIME_INTERVAL_IN_MINUTES') else constants.DEFAULT_QUERY_TIME_INTERVAL_IN_MINUTES
             # add minute suffix since this format required for LA queries
-            env_dict['DEFAULT_QUERY_TIME_INTERVAL_IN_MINUTES'] = str(queryTimeInterval) + "m"
+            env_dict[
+                'DEFAULT_QUERY_TIME_INTERVAL_IN_MINUTES'
+            ] = f"{str(queryTimeInterval)}m"
+
 
             # get default query time interval for metrics queries
             env_dict['DEFAULT_METRICS_QUERY_TIME_INTERVAL_IN_MINUTES'] = int(os.getenv('DEFAULT_METRICS_QUERY_TIME_INTERVAL_IN_MINUTES')) if os.getenv('DEFAULT_METRICS_QUERY_TIME_INTERVAL_IN_MINUTES') else constants.DEFAULT_METRICS_QUERY_TIME_INTERVAL_IN_MINUTES
@@ -76,7 +79,7 @@ def env_dict():
     yield env_dict
 
     my_file = Path("env.pkl")
-    with FileLock(str(my_file) + ".lock"):
+    with FileLock(f"{str(my_file)}.lock"):
         with Path.open(my_file, "rb") as f:
             env_dict = pickle.load(f)
 

@@ -21,7 +21,7 @@ def test_ds_workflows(env_dict):
     try:
         config.load_incluster_config()
     except Exception as e:
-        pytest.fail("Error loading the in-cluster config: " + str(e))
+        pytest.fail(f"Error loading the in-cluster config: {str(e)}")
 
     print("getting daemonset pod list")
     api_instance = client.CoreV1Api()
@@ -39,9 +39,15 @@ def test_ds_workflows(env_dict):
         pytest.fail("number of items in daemonset pod list should be greater than 0")
 
     waitTimeSeconds = env_dict['AGENT_WAIT_TIME_SECS']
-    print("start: waiting for seconds: {} for agent workflows to get emitted".format(waitTimeSeconds))
+    print(
+        f"start: waiting for seconds: {waitTimeSeconds} for agent workflows to get emitted"
+    )
+
     time.sleep(int(waitTimeSeconds))
-    print("complete: waiting for seconds: {} for agent workflows to get emitted".format(waitTimeSeconds))
+    print(
+        f"complete: waiting for seconds: {waitTimeSeconds} for agent workflows to get emitted"
+    )
+
 
     isOMSBaseAgent = env_dict.get('USING_OMSAGENT_BASE_AGENT')
     agentLogPath = constants.AGENT_FLUENTD_LOG_PATH
@@ -53,10 +59,10 @@ def test_ds_workflows(env_dict):
         logcontent = get_log_file_content(
             api_instance, constants.AGENT_RESOURCES_NAMESPACE, podName, constants.OMSAGENT_MAIN_CONTAINER_NAME, agentLogPath)
         if not logcontent:
-            pytest.fail("logcontent should not be null or empty for pod: " + podName)
+            pytest.fail(f"logcontent should not be null or empty for pod: {podName}")
         loglines = logcontent.split("\n")
         if len(loglines) <= 0:
-            pytest.fail("number of log lines should be greater than 0 for pod :" + podName)
+            pytest.fail(f"number of log lines should be greater than 0 for pod :{podName}")
 
         IsContainerPerfEmitStream = False
         IsContainerInventoryStream = False
@@ -67,9 +73,15 @@ def test_ds_workflows(env_dict):
                 IsContainerInventoryStream = True
 
         if IsContainerPerfEmitStream == False:
-            pytest.fail("ContainerPerf stream not emitted successfully from pod:" + podName)
+            pytest.fail(
+                f"ContainerPerf stream not emitted successfully from pod:{podName}"
+            )
+
         if IsContainerInventoryStream == False:
-            pytest.fail("ContainerInventory stream not emitted successfully from pod:" + podName)
+            pytest.fail(
+                f"ContainerInventory stream not emitted successfully from pod:{podName}"
+            )
+
 
     append_result_output("test_ds_workflows end \n",
                          env_dict['TEST_AGENT_LOG_FILE'])

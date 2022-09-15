@@ -21,7 +21,7 @@ def test_rs_workflows(env_dict):
     try:
         config.load_incluster_config()
     except Exception as e:
-        pytest.fail("Error loading the in-cluster config: " + str(e))
+        pytest.fail(f"Error loading the in-cluster config: {str(e)}")
 
     print("getting pod list")
     api_instance = client.CoreV1Api()
@@ -49,7 +49,7 @@ def test_rs_workflows(env_dict):
     logcontent = get_log_file_content(
         api_instance, constants.AGENT_RESOURCES_NAMESPACE, rspodName, constants.OMSAGENT_MAIN_CONTAINER_NAME, agentLogPath)
     if not logcontent:
-        pytest.fail("logcontent should not be null or empty for rs pod: {}".format(rspodName))
+        pytest.fail(f"logcontent should not be null or empty for rs pod: {rspodName}")
     loglines = logcontent.split("\n")
     if len(loglines) <= 0:
         pytest.fail("number of log lines should be greater than 0")
@@ -78,25 +78,46 @@ def test_rs_workflows(env_dict):
             IsKubeEventsSuccessful = True
 
     if IsKubePodInventorySuccessful == False:
-       pytest.fail("KubePodInventory stream not emitted successfully from pod:" + rspodName)
+        pytest.fail(
+            f"KubePodInventory stream not emitted successfully from pod:{rspodName}"
+        )
+
 
     if IsKubeNodeInventorySuccessful == False:
-        pytest.fail("KubeNodeInventory stream not emitted successfully from pod:" + rspodName)
+        pytest.fail(
+            f"KubeNodeInventory stream not emitted successfully from pod:{rspodName}"
+        )
+
 
     if IsKubeDeploymentInventorySuccessful == False:
-        pytest.fail("KubeDeploymentInventory stream not emitted successfully from pod:" + rspodName)
+        pytest.fail(
+            f"KubeDeploymentInventory stream not emitted successfully from pod:{rspodName}"
+        )
+
 
     if IsKubeContainerPerfInventorySuccessful == False:
-        pytest.fail("KubeContainerPerfInventory stream not emitted successfully from pod:" + rspodName)
+        pytest.fail(
+            f"KubeContainerPerfInventory stream not emitted successfully from pod:{rspodName}"
+        )
+
 
     if IsKubeServicesInventorySuccessful == False:
-        pytest.fail("KubeServicesInventory stream not emitted successfully from pod:" + rspodName)
+        pytest.fail(
+            f"KubeServicesInventory stream not emitted successfully from pod:{rspodName}"
+        )
+
 
     if IsContainerNodeInventorySuccessful == False:
-        pytest.fail("ContainerNodeInventory stream not emitted successfully from pod:" + rspodName)
+        pytest.fail(
+            f"ContainerNodeInventory stream not emitted successfully from pod:{rspodName}"
+        )
+
 
     if IsKubeEventsSuccessful == False:
-        pytest.fail("KubeEventsInventory stream not emitted successfully from rs pod:" + rspodName)
+        pytest.fail(
+            f"KubeEventsInventory stream not emitted successfully from rs pod:{rspodName}"
+        )
+
 
     append_result_output("test_rs_workflows end \n",
                          env_dict['TEST_AGENT_LOG_FILE'])

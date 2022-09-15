@@ -10,7 +10,11 @@ def pull_helm_chart(registry_path):
     response_helm_chart_pull = subprocess.Popen(cmd_helm_chart_pull, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output_helm_chart_pull, error_helm_chart_pull = response_helm_chart_pull.communicate()
     if response_helm_chart_pull.returncode != 0:
-        pytest.fail("Unable to pull helm chart from the registry '{}': ".format(registry_path) + error_helm_chart_pull.decode("ascii"))
+        pytest.fail(
+            f"Unable to pull helm chart from the registry '{registry_path}': "
+            + error_helm_chart_pull.decode("ascii")
+        )
+
     return output_helm_chart_pull.decode("ascii")
 
 
@@ -20,7 +24,11 @@ def export_helm_chart(registry_path, destination):
     response_helm_chart_export = subprocess.Popen(cmd_helm_chart_export, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output_helm_chart_export, error_helm_chart_export = response_helm_chart_export.communicate()
     if response_helm_chart_export.returncode != 0:
-        pytest.fail("Unable to export helm chart from the registry '{}': ".format(registry_path) + error_helm_chart_export.decode("ascii"))
+        pytest.fail(
+            f"Unable to export helm chart from the registry '{registry_path}': "
+            + error_helm_chart_export.decode("ascii")
+        )
+
     return output_helm_chart_export.decode("ascii")
 
 
@@ -30,7 +38,11 @@ def add_helm_repo(repo_name, repo_url):
     response_helm_repo = subprocess.Popen(cmd_helm_repo, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output_helm_repo, error_helm_repo = response_helm_repo.communicate()
     if response_helm_repo.returncode != 0:
-        pytest.fail("Unable to add repository {} to helm: ".format(repo_url) + error_helm_repo.decode("ascii"))
+        pytest.fail(
+            f"Unable to add repository {repo_url} to helm: "
+            + error_helm_repo.decode("ascii")
+        )
+
     return output_helm_repo.decode("ascii")
 
 
@@ -40,7 +52,7 @@ def install_helm_chart(helm_release_name, helm_release_namespace, helm_chart_pat
     if wait:
         cmd_helm_install.extend(["--wait"])
     for key, value in kwargs.items():
-        cmd_helm_install.extend(["--set", "{}={}".format(key, value)])
+        cmd_helm_install.extend(["--set", f"{key}={value}"])
     response_helm_install = subprocess.Popen(cmd_helm_install, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output_helm_install, error_helm_install = response_helm_install.communicate()
     if response_helm_install.returncode != 0:

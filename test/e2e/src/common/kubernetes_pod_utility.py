@@ -9,7 +9,7 @@ def get_pod(api_instance, namespace, pod_name):
     try:
         return api_instance.read_namespaced_pod(pod_name, namespace)
     except Exception as e:
-        pytest.fail("Error occured when retrieving pod information: " + str(e))
+        pytest.fail(f"Error occured when retrieving pod information: {str(e)}")
 
 
 # Returns a list of kubernetes pod objects in a given namespace. Object description at: https://github.com/kubernetes-client/python/blob/master/kubernetes/docs/V1PodList.md
@@ -17,7 +17,7 @@ def get_pod_list(api_instance, namespace, label_selector=""):
     try:
         return api_instance.list_namespaced_pod(namespace, label_selector=label_selector)
     except Exception as e:
-        pytest.fail("Error occurred when retrieving pod information: " + str(e))
+        pytest.fail(f"Error occurred when retrieving pod information: {str(e)}")
 
 # get the content of the log file in the container via exec
 def get_log_file_content(api_instance, namespace, podName, containerName, logfilePath):
@@ -25,7 +25,7 @@ def get_log_file_content(api_instance, namespace, podName, containerName, logfil
         exec_command = ['tar','cf', '-', logfilePath]
         return stream(api_instance.connect_get_namespaced_pod_exec, podName, namespace, command=exec_command, container=containerName, stderr=True, stdin=False, stdout=True, tty=False)
     except Exception as e:
-        pytest.fail("Error occurred when retrieving log file content: " + str(e))
+        pytest.fail(f"Error occurred when retrieving log file content: {str(e)}")
 
 # Function that watches events corresponding to pods in the given namespace and passes the events to a callback function
 def watch_pod_status(api_instance, namespace, timeout, callback=None):
@@ -37,7 +37,7 @@ def watch_pod_status(api_instance, namespace, timeout, callback=None):
             if callback(event):
                 return
     except Exception as e:
-        pytest.fail("Error occurred when checking pod status: " + str(e))
+        pytest.fail(f"Error occurred when checking pod status: {str(e)}")
     pytest.fail("The watch on the pods has timed out. Please see the pod logs for more info.")
 
 
@@ -54,7 +54,7 @@ def watch_pod_logs(api_instance, namespace, pod_name, container_name, timeout_se
             if time.time() > timeout:
                 pytest.fail("The watch on the pod logs has timed out.")
     except Exception as e:
-        pytest.fail("Error occurred when checking pod logs: " + str(e))
+        pytest.fail(f"Error occurred when checking pod logs: {str(e)}")
 
 
 # Function that returns the pod logs of a given container.
@@ -62,4 +62,4 @@ def get_pod_logs(api_instance, pod_namespace, pod_name, container_name):
     try:
         return api_instance.read_namespaced_pod_log(pod_name, pod_namespace, container=container_name)
     except Exception as e:
-        pytest.fail("Error occurred when fetching pod logs: " + str(e))
+        pytest.fail(f"Error occurred when fetching pod logs: {str(e)}")
